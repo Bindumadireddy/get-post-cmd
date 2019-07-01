@@ -1,0 +1,426 @@
+//get1
+
+var express=require('express');
+var app=express();
+
+var bodyParser=require("body-parser");
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended:true}))
+
+var students=[
+    {
+        id:1,
+        Name:"sunny",
+        college:"raghu"
+    },
+    {
+        id:2,
+        Name:"Buny",
+        college:"gitam"
+    },
+    {
+        id:5,
+        Name:"Sharma",
+        college:"raghu"
+    },
+]
+
+// app.use(express.static("public"))
+
+app.get("/",function(req,res){
+    res.send("Hello World")
+})
+
+//Get all books
+app.get("/api/students",(req,res)=>{
+    res.send(students)
+})
+
+app.post("/api/students",(req,res)=>{
+    var newStudent=req.body;
+    students.push(newStudent);
+    res.send(students);
+})
+
+app.put("/api/students/:id",(req,res)=>{
+    var id=req.params.id;
+    var studentToBeupdated=students.filter((students)=>{
+        return students.id==id
+    })
+    studentToBeupdated[0].Name="mahesh babu"
+    res.send(studentToBeupdated)
+})
+
+app.delete("/api/students/:id",(req,res)=>{
+    var id=req.params.id;
+
+    var latestStudents=students.filter((students)=>{
+        return students.id!=id
+    })
+
+    res.send(latestStudents)
+})
+
+app.listen(8000,function(){
+    console.log("Server is started")
+})
+
+//get2
+
+var express=require('express')
+var router=express.Router();
+
+var books=[
+    {
+        id:1,
+        title:"JS Fundamentals",
+        author:"John"
+    },
+    {
+        id:2,
+        title:"Angular Fundamentals",
+        author:"David"
+    },
+    {
+        id:3,
+        title:"HTML/CSS Basics",
+        author:"John"
+    }
+]
+
+router.route("/")
+    .get((req,res)=>{
+        res.send(books)
+    })
+    .post((req,res)=>{
+        var newBook=req.body;
+        books.push(newBook);
+        res.send(books);
+    })
+
+router.route("/:id")
+    .put((req,res)=>{
+        var id=req.params.id;
+        var bookToBeupdated=books.filter((book)=>{
+            return book.id==id
+        })
+        bookToBeupdated[0].title="Oracle Pro"
+        res.send(bookToBeupdated)
+    })
+    .delete((req,res)=>{
+        var id=req.params.id;
+
+        var latestBooks=books.filter((book)=>{
+            return book.id!=id
+        })
+
+        res.send(latestBooks)
+    })
+
+module.exports=router;
+
+//get2a
+
+var express=require('express')
+var router=express.Router();
+var students=[
+    {
+        id:1,
+        Name:"Bindu",
+        college:"Raghu"
+    },
+    {
+    	id:2,
+        Name:"sri",
+        college:"Raghu"
+        
+    },
+    {
+        id:3,
+        Name:"dileep",
+        college:"gitam"
+    }
+]
+
+router.route("/")
+    .get((req,res)=>{
+        res.send("students")
+    })
+    .post((req,res)=>{
+        var newStudent=req.body;
+        students.push(newStudent);
+        res.send(student);
+    })
+    router.route("/:id")
+    .put((req,res)=>{
+        var id=req.params.id;
+        var studentToBeupdated=student.filter((student)=>{
+            return student.id==id
+        })
+        studentToBeupdated[0].Name="bindusri"
+        res.send(studentToBeupdated)
+    })
+    .delete((req,res)=>{
+        var id=req.params.id;
+
+        var latestStudent=student.filter((student)=>{
+            return student.id!=id
+        })
+
+        res.send(lateststudent)
+    })
+
+
+
+
+module.exports=router;
+
+//get2b
+
+var express=require('express');
+var app=express();
+
+var books=require("./routes/books")
+var students=require("./routes/students")
+
+var bodyParser=require("body-parser");
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended:true}))
+
+app.use(express.static("public"))
+
+app.get("/",function(req,res){
+    res.send("Hello World")
+})
+
+app.use("/api/books",books)
+app.use("/api/students",students)
+
+app.listen(8000,function(){
+    console.log("Server is started")
+})
+
+//s1
+
+var express=require('express');
+var app=express();
+app.get("/",function(req,res)
+{
+	res.send("hai Welcomee to Hello World")
+})
+app.listen(9000,function(){
+	console.log("Server is started")
+})
+
+//server1
+
+var express=require('express');
+var path=require("path")
+var app=express();
+app.use(express.static("public"))
+app.get("/",function(req,res)
+{
+	res.sendFile(path.join(__dirname,"public/index.html"))
+})
+app.get("/training",function(req,res)
+{
+	res.sendFile(path.join(__dirname,"public/training.html"))
+})
+app.listen(7000,function(){
+	console.log("Server is started")
+})
+
+//serverjoin
+
+
+var express=require('express');
+var app=express();
+var path=require("path")
+var books=require("./routes/books")
+var students=require("./routes/students")
+
+var bodyParser=require("body-parser");
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended:true}))
+
+app.use(express.static("public"))
+app.all('/api/*', function (req, res, next) {
+    const auth = { login: "akrivia", password: "pass1234" } // change this
+
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
+    const [login, password] = new Buffer(b64auth, 'base64').toString().split(':')
+
+    // Verify login and password are set and correct
+    if (!login || !password ||
+        login !== auth.login ||
+        password !== auth.password) {
+        res.set('WWW-Authenticate', 'Basic realm="nope"') // change this
+        res.status(401).send('Request is not authorized. You must pass credentials')
+        return
+    }
+    else {
+        next();
+    }
+});
+app.get("/",function(req,res)
+{
+	res.sendFile(path.join(__dirname,"public/index.html"))
+})
+//app.get("/",function(req,res){
+  //  res.send("Hello World")
+//})
+
+app.use("/api/books",books)
+app.use("/api/students",students)
+
+app.listen(8000,function(){
+    console.log("Server is started")
+})
+
+//books
+
+'use strict';
+
+const Hapi = require('@hapi/hapi');
+var books=[
+    {
+        id:1,
+        title:"JS Fundamentals",
+        author:"John"
+    },
+    {
+        id:2,
+        title:"Angular Fundamentals",
+        author:"David"
+    },
+    {
+        id:3,
+        title:"HTML/CSS Basics",
+        author:"John"
+    }
+]
+
+const init = async () => {
+
+    const server = Hapi.server({
+        port: 3000,
+        host: 'localhost'
+    });
+     server.route({
+        method: 'GET',
+        path:'/',
+        handler: (request, h) => {
+
+            return books;
+        }
+    });
+      server.route({
+    method: 'POST',
+    path: '/',
+    handler: (request, h)=>{
+        
+        books.push(request.payload);
+        
+        //const books = request.payload;
+        return books;
+    }
+});  
+    /*server.route({
+    method: 'PUT',
+    path: '/{title}',
+    handler: (request, h)=>{
+        var id=request.params.title;
+
+        var bookToBeupdated=books.filter((book)=>{
+
+        return book.title==id;
+    })
+    bookToBeupdated[0].author=request.payload.author;
+        return bookToBeupdated;
+        
+    }
+       
+    
+});*/
+    server.route({
+    method: 'PUT',
+    path: '/{id}',
+    handler: (request, h)=>{
+        var id=request.params.id;
+
+        var bookToBeupdated=books.filter((book)=>{
+
+        return book.id==id;
+    })
+    bookToBeupdated[0].title=request.payload.title;
+        return bookToBeupdated;
+        
+    }
+       
+    
+});
+    server.route({
+    method: 'DELETE',
+    path: '/{id}',
+    handler: (request, h)=>{
+        var id=request.params.id;
+
+        var latestBooks=books.filter((book)=>{
+
+        return book.id!=id;
+    })
+   
+    return latestBooks;
+        
+    }
+       
+    
+});
+     
+     
+    await server.start();
+    console.log('Server running on %s', server.info.uri);
+};
+
+process.on('unhandledRejection', (err) => {
+
+    console.log(err);
+    process.exit(1);
+});
+
+init();
+
+//get
+
+
+'use strict';
+
+const Hapi = require('@hapi/hapi');
+
+const init = async () => {
+
+    const server = Hapi.server({
+        port: 3000,
+        host: 'localhost'
+    });
+     server.route({
+        method: 'GET',
+        path:'/',
+        handler: (request, h) => {
+
+            return 'Hello World!';
+        }
+    });
+
+
+    await server.start();
+    console.log('Server running on %s', server.info.uri);
+};
+
+process.on('unhandledRejection', (err) => {
+
+    console.log(err);
+    process.exit(1);
+});
+
+init();
